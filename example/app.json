@@ -13,7 +13,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "expo.modules.geolocation.example"
+      "bundleIdentifier": "expo.modules.geolocation.example",
+      "infoPlist": {
+        "NSLocationAlwaysUsageDescription": "This app needs access to location when in the background.",
+        "NSLocationWhenInUseUsageDescription": "This app needs access to location when open."
+      }
     },
     "android": {
       "adaptiveIcon": {

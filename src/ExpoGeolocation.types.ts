@@ -1,7 +1,11 @@
-export type ChangeEventPayload = {
-  value: string;
+export type Coordinates = {
+  latitude: number | null;
+  longitude: number | null;
+  /** Unix timestamp in milliseconds */
+  timestamp: number | null;
 };
 
-export type ExpoGeolocationViewProps = {
-  name: string;
-};
+export interface ExpoGeolocationModule {
+  requestPermissions(): void;
+  getCurrentCoordinates(): Promise<Coordinates>;
+}

@@ -1,46 +1,41 @@
 package expo.modules.geolocation
 
+import android.Manifest
+import com.google.android.gms.location.*
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import expo.modules.kotlin.Promise
+import expo.modules.kotlin.exception.toCodedException
 
 class ExpoGeolocationModule : Module() {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
+  private lateinit var fusedLocationManager: FusedLocationProviderClient
+
   override fun definition() = ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('ExpoGeolocation')` in JavaScript.
     Name("ExpoGeolocation")
 
-    // Sets constant properties on the module. Can take a dictionary or a closure that returns a dictionary.
-    Constants(
-      "PI" to Math.PI
-    )
-
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
-
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      "Hello world! 👋"
+    OnCreate {
+      fusedLocationManager = LocationServices.getFusedLocationProviderClient(appContext.currentActivity)
     }
 
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { value: String ->
-      // Send an event to JavaScript.
-      sendEvent("onChange", mapOf(
-        "value" to value
-      ))
+    Function("requestPermissions") {
+      appContext.permissions?.askForPermissions({}, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
     }
 
-    // Enables the module to be used as a native view. Definition components that are accepted as part of
-    // the view definition: Prop, Events.
-    View(ExpoGeolocationView::class) {
-      // Defines a setter for the `name` prop.
-      Prop("name") { view: ExpoGeolocationView, prop: String ->
-        println(prop)
+    AsyncFunction("getCurrentCoordinates") { promise: Promise ->
+      try {
+        fusedLocationManager.lastLocation.addOnSuccessListener { location ->
+          promise.resolve(
+            mapOf(
+              "latitude" to location?.latitude,
+              "longitude" to location?.longitude,
+              "timestamp" to location?.time
+            )
+          )
+        }.addOnFailureListener {
+          promise.reject(it.toCodedException())
+        }
+      } catch (e: SecurityException) {
+        promise.reject(e.toCodedException())
       }
     }
   }

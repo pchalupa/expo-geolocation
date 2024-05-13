@@ -28,11 +28,11 @@
   "author": "pchalupa <chalupa.petr93@gmail.com> (https://github.com/pchalupa)",
   "license": "MIT",
   "homepage": "https://github.com/pchalupa/expo-geolocation#readme",
-  "dependencies": {},
   "devDependencies": {
     "@types/react": "^18.0.25",
     "expo-module-scripts": "^3.5.1",
-    "expo-modules-core": "^1.12.9"
+    "expo-modules-core": "^1.12.9",
+    "prettier": "^3.2.5"
   },
   "peerDependencies": {
     "expo": "*",
